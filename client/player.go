@@ -2,6 +2,7 @@ package main
 
 import (
 	"math"
+	"time"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -11,6 +12,9 @@ type Player struct {
 	Velocity Vector2
 	Texture  rl.Texture2D
 	Jumping  bool
+	Dashing  bool
+	CanDash  bool
+	LastDash int64
 }
 
 func NewPlayer() *Player {
@@ -28,6 +32,9 @@ func NewPlayer() *Player {
 		},
 		texture,
 		false,
+		false,
+		true,
+		time.Now().UnixMilli(),
 	}
 
 }
@@ -36,6 +43,8 @@ const PLAYER_MAX_SPEED = 500
 const PLAYER_ACCELERATION = 3
 const PLAYER_GRAVITY = 1
 const PLAYER_JUMP = 60
+const PLAYER_DASH_STENGTH = 800
+const PLAYER_DASH_DURATION = 400
 
 func (p *Player) Move() {
 	p.X += p.Velocity.X * rl.GetFrameTime()
@@ -44,18 +53,25 @@ func (p *Player) Move() {
 
 func (p *Player) HandleInput() {
 
-	if rl.IsKeyDown(rl.KeyA) {
+	if rl.IsKeyDown(rl.KeyA) && !p.Dashing {
 		if !(math.Abs(float64(p.Velocity.X))-PLAYER_ACCELERATION > PLAYER_MAX_SPEED) {
 			p.Velocity.X -= PLAYER_ACCELERATION
 		}
 	}
-	if rl.IsKeyDown(rl.KeyD) {
+	if rl.IsKeyDown(rl.KeyD) && !p.Dashing {
 		if !(math.Abs(float64(p.Velocity.X))+PLAYER_ACCELERATION > PLAYER_MAX_SPEED) {
 			p.Velocity.X += PLAYER_ACCELERATION
 		}
 	}
 	if rl.IsKeyDown(rl.KeySpace) {
 		p.Jump()
+	}
+	if (rl.IsKeyDown(rl.KeyLeftShift) || rl.IsMouseButtonDown(rl.MouseButtonLeft)) && !p.Dashing && p.CanDash {
+		p.Dash()
+	}
+
+	if time.Now().UnixMilli()-p.LastDash >= PLAYER_DASH_DURATION {
+		p.Dashing = false
 	}
 
 	if p.Velocity.X > 0 {
@@ -64,6 +80,29 @@ func (p *Player) HandleInput() {
 		p.Velocity.X++
 	}
 
+}
+
+func (p *Player) Dash() {
+	p.Dashing = true
+	p.CanDash = false
+	p.LastDash = time.Now().UnixMilli()
+	p.Velocity.Y = 0
+	dx := 0
+	dy := 0
+	if rl.IsKeyDown(rl.KeyA) {
+		dx -= 1
+	}
+	if rl.IsKeyDown(rl.KeyD) {
+		dx += 1
+	}
+	if rl.IsKeyDown(rl.KeyW) {
+		dy -= 1
+	}
+	if rl.IsKeyDown(rl.KeyS) {
+		dy += 1
+	}
+	p.Velocity.X += float32(dx) * (PLAYER_DASH_STENGTH)
+	p.Velocity.Y += float32(dy) * (PLAYER_DASH_STENGTH * 0.6)
 }
 
 func (p *Player) Jump() {
@@ -75,13 +114,17 @@ func (p *Player) Jump() {
 }
 
 func (p *Player) Gravity() {
-	p.Velocity.Y += PLAYER_GRAVITY
 	p.OnGround()
+	if p.Dashing {
+		return
+	}
+	p.Velocity.Y += PLAYER_GRAVITY
 }
 
 func (p *Player) OnGround() bool {
 	if p.GetHitbox().BottomRight.Y > float32(getFloor()-1) {
 		p.Jumping = false
+		p.CanDash = true
 		p.Velocity.Y = 0
 		return true
 	}
