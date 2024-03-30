@@ -25,12 +25,13 @@ func main() {
 	setBox()
 
 	player := NewPlayer()
-	player.Velocity.X = 20
+	//player.Velocity.X = 20
 
 	for !rl.WindowShouldClose() {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.DarkGray)
 
+		player.HandleInput()
 		player.Move()
 		player.Draw()
 		hitbox := player.GetHitbox()
