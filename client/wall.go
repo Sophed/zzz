@@ -3,7 +3,7 @@ package main
 import rl "github.com/gen2brain/raylib-go/raylib"
 
 type Vector2 struct {
-	X, Y int32
+	X, Y float32
 }
 
 type Wall struct {
@@ -14,10 +14,10 @@ type Wall struct {
 
 func (w *Wall) Draw() {
 	rl.DrawRectangle(
-		w.TopLeft.X,
-		w.TopLeft.Y,
-		w.BottomRight.X-w.TopLeft.X,
-		w.BottomRight.Y-w.TopLeft.Y,
+		int32(w.TopLeft.X),
+		int32(w.TopLeft.Y),
+		int32(w.BottomRight.X-w.TopLeft.X),
+		int32(w.BottomRight.Y-w.TopLeft.Y),
 		w.Color,
 	)
 }

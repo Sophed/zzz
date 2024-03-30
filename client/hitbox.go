@@ -7,20 +7,20 @@ type Hitbox struct {
 	BottomRight Vector2
 }
 
-func (h *Hitbox) Width() int32 {
+func (h *Hitbox) Width() float32 {
 	return h.BottomRight.X - h.TopLeft.X
 }
 
-func (h *Hitbox) Height() int32 {
+func (h *Hitbox) Height() float32 {
 	return h.BottomRight.Y - h.TopLeft.Y
 }
 
 func (h *Hitbox) Draw() {
 	rl.DrawRectangleLines(
-		h.TopLeft.X,
-		h.TopLeft.Y,
-		h.Width()*PIXEL_SCALE,
-		h.Height()*PIXEL_SCALE,
+		int32(h.TopLeft.X),
+		int32(h.TopLeft.Y),
+		int32(h.Width()*PIXEL_SCALE),
+		int32(h.Height()*PIXEL_SCALE),
 		rl.Red,
 	)
 }

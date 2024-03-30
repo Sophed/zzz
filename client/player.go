@@ -3,8 +3,9 @@ package main
 import rl "github.com/gen2brain/raylib-go/raylib"
 
 type Player struct {
-	X, Y    int32
-	Texture rl.Texture2D
+	X, Y     float32
+	Velocity Vector2
+	Texture  rl.Texture2D
 }
 
 func NewPlayer() *Player {
@@ -13,9 +14,18 @@ func NewPlayer() *Player {
 	return &Player{
 		WINDOW_WIDTH / 2,
 		WINDOW_HEIGHT / 2,
+		Vector2{
+			0,
+			0,
+		},
 		texture,
 	}
 
+}
+
+func (p *Player) Move() {
+	p.X += p.Velocity.X * rl.GetFrameTime()
+	p.Y += p.Velocity.Y * rl.GetFrameTime()
 }
 
 func (p *Player) GetHitbox() Hitbox {
@@ -25,8 +35,8 @@ func (p *Player) GetHitbox() Hitbox {
 			p.Y,
 		},
 		Vector2{
-			p.X + p.Texture.Width,
-			p.Y + p.Texture.Height,
+			p.X + float32(p.Texture.Width),
+			p.Y + float32(p.Texture.Height),
 		},
 	}
 }
@@ -37,8 +47,8 @@ func (p *Player) Draw() {
 	texture.Width = texture.Width * PIXEL_SCALE
 	rl.DrawTexture(
 		texture,
-		p.X,
-		p.Y,
+		int32(p.X),
+		int32(p.Y),
 		rl.White,
 	)
 }

@@ -25,11 +25,13 @@ func main() {
 	setBox()
 
 	player := NewPlayer()
+	player.Velocity.X = 20
 
 	for !rl.WindowShouldClose() {
 		rl.BeginDrawing()
-		rl.ClearBackground(rl.Black)
+		rl.ClearBackground(rl.DarkGray)
 
+		player.Move()
 		player.Draw()
 		hitbox := player.GetHitbox()
 		hitbox.Draw()
@@ -45,5 +47,5 @@ func drawFPS() {
 	if time.Now().UnixMilli()%500 == 0 {
 		FPS = int(rl.GetFPS())
 	}
-	rl.DrawText("FPS: "+strconv.Itoa(FPS), 20, 20, 20, rl.LightGray)
+	rl.DrawText("FPS: "+strconv.Itoa(FPS), 20, 20, 20, rl.RayWhite)
 }
