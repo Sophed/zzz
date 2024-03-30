@@ -33,6 +33,7 @@ func main() {
 
 		player.HandleInput()
 		player.Move()
+		player.Gravity()
 		player.Draw()
 		hitbox := player.GetHitbox()
 		hitbox.Draw()

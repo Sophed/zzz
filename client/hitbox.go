@@ -19,8 +19,8 @@ func (h *Hitbox) Draw() {
 	rl.DrawRectangleLines(
 		int32(h.TopLeft.X),
 		int32(h.TopLeft.Y),
-		int32(h.Width()*PIXEL_SCALE),
-		int32(h.Height()*PIXEL_SCALE),
+		int32(h.Width()),
+		int32(h.Height()),
 		rl.Red,
 	)
 }
