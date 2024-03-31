@@ -1,12 +1,10 @@
 package main
 
 import (
-	"strconv"
-	"time"
-
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
+const DEBUG = true
 const ASSETS_DIR = "assets/"
 const WINDOW_WIDTH = 1280
 const WINDOW_HEIGHT = 720
@@ -14,8 +12,6 @@ const PIXEL_SCALE = 4
 
 const BOX_PADDING = PIXEL_SCALE * 16
 const BOX_WIDTH = PIXEL_SCALE * 4
-
-var FPS int
 
 func main() {
 
@@ -25,7 +21,6 @@ func main() {
 	setBox()
 
 	player := NewPlayer()
-	//player.Velocity.X = 20
 
 	for !rl.WindowShouldClose() {
 		rl.BeginDrawing()
@@ -36,18 +31,15 @@ func main() {
 		player.Gravity()
 		player.Draw()
 		hitbox := player.GetHitbox()
-		hitbox.Draw()
 
 		drawBox()
-		drawFPS()
+
+		if DEBUG {
+			drawDebugHud()
+			hitbox.Draw()
+		}
+
 		rl.EndDrawing()
 	}
 
-}
-
-func drawFPS() {
-	if time.Now().UnixMilli()%500 == 0 {
-		FPS = int(rl.GetFPS())
-	}
-	rl.DrawText("FPS: "+strconv.Itoa(FPS), 20, 20, 20, rl.RayWhite)
 }
