@@ -10,13 +10,14 @@ import (
 var FPS int
 var elements = make(map[string]string)
 
-func drawDebugHud() {
+func drawDebugHud(player *Player) {
 
 	if time.Now().UnixMilli()%500 == 0 {
 		FPS = int(rl.GetFPS())
 	}
 
-	elements["FPS"] = strconv.Itoa(FPS)
+	//elements["FPS"] = strconv.Itoa(FPS)
+	elements["Direction"] = strconv.Itoa(player.Direction)
 
 	offset := int32(20)
 	for k, v := range elements {

@@ -35,7 +35,8 @@ func main() {
 		drawBox()
 
 		if DEBUG {
-			drawDebugHud()
+			drawDebugHud(player)
+			player.DrawDirection()
 			hitbox.Draw()
 		}
 

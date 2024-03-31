@@ -8,13 +8,14 @@ import (
 )
 
 type Player struct {
-	X, Y     float32
-	Velocity Vector2
-	Texture  rl.Texture2D
-	Jumping  bool
-	Dashing  bool
-	CanDash  bool
-	LastDash int64
+	X, Y      float32
+	Velocity  Vector2
+	Texture   rl.Texture2D
+	Jumping   bool
+	Dashing   bool
+	CanDash   bool
+	LastDash  int64
+	Direction int
 }
 
 func NewPlayer() *Player {
@@ -35,6 +36,7 @@ func NewPlayer() *Player {
 		false,
 		true,
 		time.Now().UnixMilli(),
+		1,
 	}
 
 }
@@ -44,7 +46,7 @@ const PLAYER_ACCELERATION = 3
 const PLAYER_GRAVITY = 1
 const PLAYER_JUMP = 60
 const PLAYER_DASH_STENGTH = 800
-const PLAYER_DASH_DURATION = 400
+const PLAYER_DASH_DURATION = 200
 
 func (p *Player) Move() {
 	p.X += p.Velocity.X * rl.GetFrameTime()
@@ -57,16 +59,22 @@ func (p *Player) HandleInput() {
 		if !(math.Abs(float64(p.Velocity.X))-PLAYER_ACCELERATION > PLAYER_MAX_SPEED) {
 			p.Velocity.X -= PLAYER_ACCELERATION
 		}
+		if !rl.IsKeyDown(rl.KeyD) {
+			p.Direction = -1
+		}
 	}
 	if rl.IsKeyDown(rl.KeyD) && !p.Dashing {
 		if !(math.Abs(float64(p.Velocity.X))+PLAYER_ACCELERATION > PLAYER_MAX_SPEED) {
 			p.Velocity.X += PLAYER_ACCELERATION
 		}
+		if !rl.IsKeyDown(rl.KeyA) {
+			p.Direction = 1
+		}
 	}
 	if rl.IsKeyDown(rl.KeySpace) {
 		p.Jump()
 	}
-	if (rl.IsKeyDown(rl.KeyLeftShift) || rl.IsMouseButtonDown(rl.MouseButtonLeft)) && !p.Dashing && p.CanDash {
+	if (rl.IsKeyDown(rl.KeyLeftShift) || rl.IsMouseButtonDown(rl.MouseButtonLeft)) && !p.Dashing && p.CanDash && !p.OnGround() {
 		p.Dash()
 	}
 
@@ -87,22 +95,30 @@ func (p *Player) Dash() {
 	p.CanDash = false
 	p.LastDash = time.Now().UnixMilli()
 	p.Velocity.Y = 0
+	p.ClipSpeed()
 	dx := 0
-	dy := 0
+	//dy := 0
 	if rl.IsKeyDown(rl.KeyA) {
 		dx -= 1
 	}
 	if rl.IsKeyDown(rl.KeyD) {
 		dx += 1
 	}
-	if rl.IsKeyDown(rl.KeyW) {
+	if dx == 0 {
+		dx = p.Direction
+	}
+	/*if rl.IsKeyDown(rl.KeyW) {
 		dy -= 1
 	}
 	if rl.IsKeyDown(rl.KeyS) {
 		dy += 1
-	}
+	}*/
 	p.Velocity.X += float32(dx) * (PLAYER_DASH_STENGTH)
-	p.Velocity.Y += float32(dy) * (PLAYER_DASH_STENGTH * 0.6)
+	//p.Velocity.Y += float32(dy) * (PLAYER_DASH_STENGTH * 0.6)
+}
+
+func (p *Player) ClipSpeed() {
+	p.Velocity.X = PLAYER_MAX_SPEED * float32(p.Direction)
 }
 
 func (p *Player) Jump() {
@@ -150,5 +166,21 @@ func (p *Player) Draw() {
 		int32(p.X),
 		int32(p.Y),
 		rl.White,
+	)
+}
+
+const DIRECTION_LINE_LENGTH = 100
+
+func (p *Player) DrawDirection() {
+	center := Vector2{
+		p.X + (float32(p.Texture.Width) / 2),
+		p.Y + (float32(p.Texture.Height) / 2),
+	}
+	rl.DrawLine(
+		int32(center.X),
+		int32(center.Y),
+		int32(center.X)+(DIRECTION_LINE_LENGTH*int32(p.Direction)),
+		int32(center.Y),
+		rl.Green,
 	)
 }
