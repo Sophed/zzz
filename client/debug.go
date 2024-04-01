@@ -17,7 +17,7 @@ func drawDebugHud(player *Player) {
 	}
 
 	//elements["FPS"] = strconv.Itoa(FPS)
-	elements["Direction"] = strconv.Itoa(player.Direction)
+	elements["Y"] = strconv.FormatFloat(float64(player.Y), 'f', -1, 64)
 
 	offset := int32(20)
 	for k, v := range elements {

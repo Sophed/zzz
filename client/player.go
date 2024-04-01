@@ -130,7 +130,9 @@ func (p *Player) Jump() {
 }
 
 func (p *Player) Gravity() {
-	p.OnGround()
+	if p.OnGround() {
+		return
+	}
 	if p.Dashing {
 		return
 	}
