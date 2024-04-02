@@ -55,7 +55,7 @@ func (p *Player) Move() {
 
 func (p *Player) HandleInput() {
 
-	if rl.IsKeyDown(rl.KeyA) && !p.Dashing {
+	if rl.IsKeyDown(rl.KeyA) && !p.Dashing && !p.GetHitbox().Colliding(&left_wall) {
 		if !(math.Abs(float64(p.Velocity.X))-PLAYER_ACCELERATION > PLAYER_MAX_SPEED) {
 			p.Velocity.X -= PLAYER_ACCELERATION
 		}
@@ -63,7 +63,7 @@ func (p *Player) HandleInput() {
 			p.Direction = -1
 		}
 	}
-	if rl.IsKeyDown(rl.KeyD) && !p.Dashing {
+	if rl.IsKeyDown(rl.KeyD) && !p.Dashing && !p.GetHitbox().Colliding(&right_wall) {
 		if !(math.Abs(float64(p.Velocity.X))+PLAYER_ACCELERATION > PLAYER_MAX_SPEED) {
 			p.Velocity.X += PLAYER_ACCELERATION
 		}
@@ -83,8 +83,14 @@ func (p *Player) HandleInput() {
 	}
 
 	if p.Velocity.X > 0 {
+		if p.GetHitbox().Colliding(&right_wall) {
+			p.Velocity.X = 0
+		}
 		p.Velocity.X--
 	} else if p.Velocity.X < 0 {
+		if p.GetHitbox().Colliding(&left_wall) {
+			p.Velocity.X = 0
+		}
 		p.Velocity.X++
 	}
 
@@ -97,7 +103,6 @@ func (p *Player) Dash() {
 	p.Velocity.Y = 0
 	p.ClipSpeed()
 	dx := 0
-	//dy := 0
 	if rl.IsKeyDown(rl.KeyA) {
 		dx -= 1
 	}
@@ -107,14 +112,7 @@ func (p *Player) Dash() {
 	if dx == 0 {
 		dx = p.Direction
 	}
-	/*if rl.IsKeyDown(rl.KeyW) {
-		dy -= 1
-	}
-	if rl.IsKeyDown(rl.KeyS) {
-		dy += 1
-	}*/
 	p.Velocity.X += float32(dx) * (PLAYER_DASH_STENGTH)
-	//p.Velocity.Y += float32(dy) * (PLAYER_DASH_STENGTH * 0.6)
 }
 
 func (p *Player) ClipSpeed() {

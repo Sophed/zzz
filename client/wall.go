@@ -21,13 +21,3 @@ func (w *Wall) Draw() {
 		w.Color,
 	)
 }
-
-func (w *Wall) Colliding(v Vector2) bool {
-	if v.X < w.TopLeft.X && v.X > w.BottomRight.X {
-		return true
-	}
-	if v.Y < w.TopLeft.Y && v.Y > w.BottomRight.Y {
-		return true
-	}
-	return false
-}
